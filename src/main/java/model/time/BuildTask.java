@@ -1,9 +1,7 @@
+
 package model.time;
 
-import model.building.Building;
-import model.building.BuildingStatus;
-import model.building.BuildingType;
-import model.building.MinerBuilding;
+import model.building.*;
 import model.village.Village;
 import model.world.Coordinate;
 import service.buildings.BuildingFactory;
@@ -13,15 +11,26 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+
 public class BuildTask extends TimedOperation {
 
     private BuildingType buildingType;
+    private PlantType plantType;
     private Coordinate coordinate;
 
     public BuildTask(Instant startTime, Instant finishTime, BuildingType buildingType, Coordinate coordinate) {
         super(startTime, finishTime, TimedOperationType.BUILD_TASK);
         this.buildingType = buildingType;
         this.coordinate = coordinate;
+    }
+    public BuildTask(Instant startTime, Instant finishTime, PlantType plantType, Coordinate coordinate) {
+        super(startTime, finishTime, TimedOperationType.BUILD_TASK);
+        this.plantType = plantType;
+        this.coordinate = coordinate;
+    }
+
+    public PlantType getPlantType() {
+        return plantType;
     }
 
     @Override
@@ -47,6 +56,13 @@ public class BuildTask extends TimedOperation {
                 toAdd.add(productionTask);
             }
         }
+        for(Building b : village.getBuildings().values()){
+            if(b instanceof Laboratory lab){
+                Plant plant = new Plant(plantType, coordinate, lab.getLevel());
+                village.getPlant().put(plant.getId(), plant);
+                break;
+            }
+        }
     }
 
     public BuildingType getBuildingType() {
@@ -65,3 +81,5 @@ public class BuildTask extends TimedOperation {
         this.coordinate = coordinate;
     }
 }
+
+

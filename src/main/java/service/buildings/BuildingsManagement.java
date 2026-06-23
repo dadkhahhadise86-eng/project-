@@ -1,10 +1,6 @@
 package service.buildings;
 
-
-import model.building.Building;
-import model.building.BuildingStatus;
-import model.building.Cost;
-import model.building.BuildingType;
+import model.building.*;
 import model.player.Player;
 import model.resources.Resources;
 import model.time.BuildTask;
@@ -14,11 +10,12 @@ import model.world.Coordinate;
 import service.resource.ResourcesManagement;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public class BuildingsManagement {
 
-   private final Village village;
-   private final ResourcesManagement resources;
+    private final Village village;
+    private final ResourcesManagement resources;
 
     public BuildingsManagement(Player player) {
         this.village = player.getVillage();
@@ -38,6 +35,26 @@ public class BuildingsManagement {
             return;
         }
     }
+    public void buildPlant(PlantType plantType, Coordinate coor){
+        Laboratory laboratory=null;
+        for(Building building1 : village.getBuildings().values()){
+            if(building1 instanceof Laboratory lab){
+                laboratory = lab;
+                break;
+            }
+        }
+        if(laboratory==null){return;}
+        if(laboratory.getLevel()<plantType.getRequiredLaboratoryLevel()){return;}
+        Cost cost = Cost.buildCost(plantType);
+
+        if(resources.checkResourcesCost(cost)){
+            resources.withdrawResourcesCost(cost);
+            BuildTask buildTask=new BuildTask(Instant.now(),
+                    Instant.now().plus(cost.getNeededTime()), plantType,coor);
+            village.getTimedOperation().put(buildTask.getId(), buildTask);
+        }else
+            return;
+    }
 
     public void upgrade(Building building){
 
@@ -55,5 +72,14 @@ public class BuildingsManagement {
         }else{
             return;
         }
+    }
+
+
+    public void removePlant(UUID plantId){
+        village.getPlant().remove(plantId);
+    }
+
+    public int getTotalNeutralizationPower(){
+        return PlantType.getTotalNeutralizationPower(village.getPlant());
     }
 }

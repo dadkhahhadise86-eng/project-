@@ -1,5 +1,7 @@
+
 package model.building;
 
+import model.village.Village;
 import model.world.Coordinate;
 
 import java.time.Duration;
@@ -28,6 +30,7 @@ public class Laboratory extends Building{
                 new Cost(0, 0, 0, 0, 0, 0, 0, Duration.ofMinutes(10))));
 
         upgradeLaboratoryBuildingsCost.put(4, new UpgradeBuildingInfo(1 ,1,
+
                 new Cost(0, 0, 0, 0, 0, 0, 0, Duration.ofMinutes(10))));
     }
 
@@ -37,7 +40,19 @@ public class Laboratory extends Building{
 
     @Override
     public void upgrade() {
+        this.setLevel(this.getLevel() + 1);
         this.setBuildingStatus(BuildingStatus.ACTIVE);
-
     }
+    public void upgradeWithVillage(Village village) {
+        upgrade();
+        for (Plant plant : village.getPlant().values()) {
+            if (plant.getBuiltAtLevel() < this.getLevel()) {
+                plant.upgradeNeutralizationPower();
+            }
+        }
+    }
+
+
 }
+
+

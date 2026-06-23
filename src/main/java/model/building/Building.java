@@ -1,3 +1,4 @@
+
 package model.building;
 
 import model.world.Coordinate;
@@ -50,3 +51,4 @@ public abstract class Building {
         this.level = level;
     }
 }
+
