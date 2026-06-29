@@ -11,6 +11,8 @@ import model.world.Coordinate;
 import service.resource.ResourcesManagement;
 
 import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
 
 public class BuildingsManagement {
 
@@ -35,7 +37,7 @@ public class BuildingsManagement {
             return;
         }
     }
-    public void buildPlant(PlantType plantType){
+    public void buildPlant(PlantType plantType, Coordinate coor){
         Laboratory laboratory=null;
         for(Building building1 : village.getBuildings().values()){
             if(building1 instanceof Laboratory lab){
@@ -50,7 +52,7 @@ public class BuildingsManagement {
         if(resources.checkResourcesCost(cost)){
             resources.withdrawResourcesCost(cost);
             BuildTask buildTask=new BuildTask(Instant.now(),
-                    Instant.now().plus(cost.getNeededTime()), plantType);
+                    Instant.now().plus(cost.getNeededTime()), plantType,coor);
             village.getTimedOperation().put(buildTask.getId(), buildTask);
         }else
             return;
@@ -72,5 +74,14 @@ public class BuildingsManagement {
         }else{
             return;
         }
+    }
+
+
+    public void removePlant(UUID plantId){
+        village.getPlant().remove(plantId);
+    }
+
+    public int getTotalNeutralizationPower(){
+        return PlantType.getTotalNeutralizationPower(village.getPlant());
     }
 }
